@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rapport de stage – Détection de communautés dans les graphes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfcfe;--ink:#14213d;--muted:#55607a;--blue:#0a49b0;--sky:#4db3f0;--line:#d9e2f1;--soft:#eef3fb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1526;--ink:#e6ecf7;--muted:#9aa7c2;--blue:#7fb0ff;--sky:#4db3f0;--line:#243252;--soft:#15203a}}
+:root[data-theme="dark"]{--bg:#0d1526;--ink:#e6ecf7;--muted:#9aa7c2;--blue:#7fb0ff;--sky:#4db3f0;--line:#243252;--soft:#15203a}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 1rem)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.06rem/1.7 "Source Serif 4",Georgia,serif}
+h1,h2,h3,nav,.meta,th,summary,.k{font-family:Poppins,"Helvetica Neue",Arial,sans-serif}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:3rem;max-width:1080px;margin:0 auto;padding:0 1.25rem}
+nav{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;padding:2rem 0;font-size:.86rem}
+nav b{display:block;margin-bottom:.8rem;color:var(--blue)}
+nav a{display:block;padding:.3rem 0 .3rem .8rem;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
+nav a:hover,nav a.on{color:var(--blue);border-color:var(--blue)}
+header{padding:3rem 0 1.5rem;border-bottom:1px solid var(--line)}
+header .g{display:grid;grid-template-columns:1fr 200px;gap:1.5rem;align-items:center}
+h1{font-size:clamp(1.9rem,4.5vw,2.9rem);line-height:1.15;margin:.2rem 0 1rem;color:var(--blue);font-weight:700}
+.sub{color:var(--muted);margin:0 0 1.2rem}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1rem;font-size:.85rem;margin:0}
+.meta dt{color:var(--muted)}.meta dd{margin:0;font-weight:500}
+svg.graph{width:100%;height:auto}
+main{padding-bottom:4rem;max-width:68ch}
+section{padding-top:2.5rem}
+h2{font-size:1.5rem;margin:0 0 .8rem;color:var(--blue);font-weight:600}
+h3{font-size:1.08rem;margin:1.8rem 0 .4rem;font-weight:600}
+p{margin:.7rem 0}li{margin:.3rem 0}
+.tw{overflow-x:auto;margin:1rem 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:420px}
+th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft);font-size:.82rem}
+ol.tl{list-style:none;margin:1rem 0;padding:0 0 0 1.2rem;border-left:2px solid var(--sky)}
+ol.tl li{margin:0 0 1.1rem;position:relative}
+ol.tl li::before{content:"";position:absolute;left:-1.6rem;top:.55rem;width:.6rem;height:.6rem;border-radius:50%;background:var(--blue)}
+.k{font-weight:600;font-size:.9rem;color:var(--blue)}
+details{border:1px solid var(--line);border-radius:6px;margin:.6rem 0;background:var(--soft)}
+summary{cursor:pointer;padding:.7rem 1rem;font-weight:500;font-size:.95rem}
+details>div{padding:0 1rem 1rem}
+.note{border-left:3px solid var(--sky);padding:.1rem 1rem;background:var(--soft)}
+footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted);font-size:.85rem;font-family:Poppins,Arial,sans-serif}
+@media(max-width:820px){.wrap{display:block}nav{position:static;padding:1rem 0 0;display:flex;flex-wrap:wrap;gap:.2rem .9rem}nav b{width:100%;margin:0}nav a{border:0;padding:.2rem 0}header .g{grid-template-columns:1fr}svg.graph{max-width:220px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Sommaire">
+<b>Sommaire</b>
+<a href="#resume">Résumé</a><a href="#intro">Introduction</a><a href="#biblio">Étude bibliographique</a><a href="#taxo">Taxonomie et classification</a><a href="#idees">Idées d'algorithmes</a><a href="#suivi">Suivi du stage</a><a href="#outils">Outils</a><a href="#annexes">Annexes</a>
+</nav>
+<div>
+<header>
+<div class="g">
+<div>
+<p class="sub">Rapport de stage 2024-2025 · 3ème année de Licence Informatique</p>
+<h1>Détection de communautés dans les graphes</h1>
+<dl class="meta">
+<dt>Auteur</dt><dd>Youcef Melakhessou</dd>
+<dt>Période</dt><dd>23 avril – 18 juin 2025</dd>
+<dt>Structure</dt><dd>LCOMS, Université de Lorraine</dd>
+<dt>Tuteurs</dt><dd>Youcef Abdelsadek, Kamel Chelghoum</dd>
+</dl>
+</div>
+<svg class="graph" viewBox="0 0 200 180" role="img" aria-label="Graphe composé de trois communautés reliées entre elles">
+<g stroke="var(--line)" stroke-width="1.5"><path d="M55 40L85 55M55 40L40 75M85 55L40 75M85 55L70 90M40 75L70 90M150 35L175 65M150 35L130 70M175 65L130 70M150 35L110 40M120 130L160 120M120 130L140 160M160 120L140 160M120 130L100 150M85 55L110 40M70 90L120 130M130 70L160 120"/></g>
+<g fill="var(--blue)"><circle cx="55" cy="40" r="7"/><circle cx="85" cy="55" r="7"/><circle cx="40" cy="75" r="7"/><circle cx="70" cy="90" r="7"/></g>
+<g fill="var(--sky)"><circle cx="150" cy="35" r="7"/><circle cx="175" cy="65" r="7"/><circle cx="130" cy="70" r="7"/><circle cx="110" cy="40" r="7"/></g>
+<g fill="var(--ink)" opacity=".75"><circle cx="120" cy="130" r="7"/><circle cx="160" cy="120" r="7"/><circle cx="140" cy="160" r="7"/><circle cx="100" cy="150" r="7"/></g>
+</svg>
+</div>
+</header>
+<main>
+
+<section id="resume"><h2>Résumé</h2>
+<p>Ce stage, réalisé au laboratoire LCOMS de l'Université de Lorraine, s'inscrit dans le domaine de la science des données et de l'apprentissage profond, appliqué à la détection de communautés dans des graphes. Face à la complexité croissante des données issues des réseaux sociaux et autres plateformes en ligne, il vise à explorer des méthodes d'analyse performantes pour extraire des structures sous-jacentes, appelées communautés, dans des graphes représentant des interactions entre entités.</p>
+<p>L'objectif principal est de proposer un algorithme de détection de communautés basé sur la propagation locale. Le travail s'est structuré en quatre étapes :</p>
+<ol><li>une étude bibliographique approfondie des méthodes existantes (agglomératives, divisives, parallèles) ;</li><li>la conception d'un algorithme original ;</li><li>l'implémentation et l'expérimentation en Python (Jupyter Notebook), avec Spark pour les données massives ;</li><li>la visualisation et l'analyse des résultats sur des données synthétiques et réelles.</li></ol>
+<p>Le stage s'est déroulé dans un environnement de calcul haute performance équipé de stations GPU, au sein de la plateforme POHP du LCOMS, avec des dispositifs de visualisation avancés (bornes et tables multi-touch).</p>
+<details><summary>English abstract</summary><div><p>This internship, carried out at the LCOMS laboratory of the University of Lorraine, falls within the field of data science and deep learning, applied to community detection in graphs. It aims to explore effective analytical methods to extract underlying structures, known as communities, in graphs representing interactions between entities. The main objective is to propose a community detection algorithm based on local propagation, through a literature review, the design of an original algorithm, its implementation and experimentation, and the analysis of results on synthetic and real-world datasets.</p></div></details>
+</section>
+
+<section id="intro"><h2>Introduction</h2>
+<p>L'essor des plateformes numériques a entraîné une explosion des données relationnelles. Ces données, souvent représentées sous forme de graphes, posent de nouveaux défis en matière d'analyse et de compréhension.</p>
+<p>Dans ce contexte, la détection de communautés, c'est-à-dire l'identification de groupes d'éléments fortement connectés, est devenue un enjeu central pour mieux comprendre les structures cachées dans les réseaux complexes.</p>
+<p>Le stage s'inscrit dans cette problématique. Il avait pour objectif de proposer une approche de détection de communautés en exploitant les techniques récentes d'apprentissage profond, notamment les réseaux de neurones convolutifs (CNN). Ce rapport présente le cadre du stage et les travaux réalisés, puis les perspectives d'amélioration.</p>
+</section>
+
+<section id="biblio"><h2>Étude bibliographique (semaines 1 à 3)</h2>
+<p>Pendant les trois premières semaines, j'ai réalisé un état de l'art sur la détection de communautés pour me familiariser avec les principales méthodes, leurs principes, leurs avantages et leurs inconvénients.</p>
+<h3>Lecture et synthèse de six articles</h3>
+<p>Pour chaque article de référence, j'ai déterminé le problème traité, examiné l'algorithme proposé, analysé les résultats expérimentaux, identifié les points forts et les limites, puis rédigé une synthèse : contexte, description simplifiée de l'algorithme, avantages (performance, scalabilité, précision), limites (résolution, sensibilité aux paramètres) et jeux de données employés. Ces synthèses ont servi de base à la taxonomie, à la classification et à la recherche d'améliorations (voir annexes).</p>
+<h3>Matrice de taxonomie</h3>
+<p>Pour comparer les algorithmes objectivement, j'ai construit une matrice de 10 algorithmes choisis parmi une trentaine cités dans les articles (Louvain, Tribase, Infomap et des variantes). Les critères : rapidité et coût, type de communautés détectées (denses, pondérées, chevauchantes, hiérarchiques), scalabilité, précision et limites connues. On y voit par exemple que LPA est rapide, Louvain précis, Tribase bien adapté à Twitter, avec des inconvénients comme la sensibilité aux paramètres ou l'absence de détection chevauchante.</p>
+<h3>Recherche d'améliorations</h3>
+<p>J'ai ensuite cherché comment la littérature répond aux limites des méthodes classiques (lenteur, non-scalabilité, partitions peu cohérentes, absence de chevauchement). Faute de temps pour lire toutes les références, j'ai procédé par filtrage : repérage de titres évoquant une amélioration (« improvement », « parallel », « scalable », « hybrid »...), lecture des résumés, sélection des articles proposant une vraie variante, puis analyse rapide de la méthode et des comparaisons avec l'original. Cela a fait ressortir 14 améliorations notables, dont :</p>
+<ul>
+<li><b>Leiden</b> : renforce la cohérence interne des communautés de Louvain.</li>
+<li><b>GVE-Louvain</b> : traitement massivement parallèle pour des graphes de taille industrielle.</li>
+<li><b>Seed Framework</b> : généralise l'approche TriBase aux graphes peu triadiques.</li>
+<li><b>Higher-Order Infomap</b> : introduit la mémoire dans les marches aléatoires.</li>
+<li><b>Méthodes multi-vues</b> : exploitent plusieurs types de relations (réseaux enrichis, graphes hétérogènes).</li>
+</ul>
+<p>Les tendances dégagées : parallélisme, méthodes hybrides et intégration de l'apprentissage automatique.</p>
+</section>
+
+<section id="taxo"><h2>Taxonomie et classification</h2>
+<p>J'ai classé les algorithmes en six familles selon leur principe de fonctionnement dominant :</p>
+<div class="tw"><table>
+<tr><th>Famille</th><th>Algorithmes</th></tr>
+<tr><td>Optimisation de la modularité</td><td>Louvain, Leiden, GVE-Louvain, Spectral modularity maximization</td></tr>
+<tr><td>Propagation locale</td><td>LPA, LPA-MNI, Wu &amp; Huberman, PSWH, MCL, HipMCL</td></tr>
+<tr><td>Méthodes hiérarchiques</td><td>HDBSCAN, Walktrap, Girvan-Newman</td></tr>
+<tr><td>Expansion locale</td><td>LFM, Tribase, Seed Framework</td></tr>
+<tr><td>Marches aléatoires</td><td>Walktrap, Infomap, Higher-Order Infomap, MCL, HipMCL</td></tr>
+<tr><td>Méthodes orientées densité</td><td>DBSCAN, HDBSCAN, CPM</td></tr>
+</table></div>
+<p>J'ai ensuite réalisé une hiérarchie visuelle qui place chaque algorithme dans sa famille, indique sa stratégie (<b>divisive</b> comme Girvan-Newman, <b>agglomérative</b> comme Walktrap, <b>hybride</b> comme LPA + Louvain) et le relie à ses améliorations (Leiden dérive de Louvain, GVE-Louvain en est une version parallèle). Elle m'a donné une compréhension fine des choix algorithmiques selon le contexte, et une base pour construire un algorithme original.</p>
+</section>
+
+<section id="idees"><h2>Idées d'algorithmes innovants (semaine 4)</h2>
+<p>J'ai orienté ma réflexion vers la propagation locale, connue pour sa rapidité et sa scalabilité mais handicapée par :</p>
+<ul><li>l'instabilité des résultats, due à l'aléatoire ;</li><li>la fusion trop rapide de communautés peu pertinentes ;</li><li>l'absence de contrôle sur la structure interne des groupes.</li></ul>
+<p>J'ai formulé et analysé <b>neuf idées</b> avec des mécanismes supplémentaires : multi-labels par nœud, pondération adaptative des arêtes, contrôle de la domination des labels. Chaque idée a été décrite (objectif, fonctionnement, intérêt et cas d'usage), puis les idées répétées ou peu viables ont été éliminées et les idées complémentaires fusionnées, pour retenir <b>trois propositions</b> évaluées sur l'innovation, la faisabilité et les gains. Chacune est accompagnée de schémas (draw.io) et de pseudo-codes complets.</p>
+<p>Le détail des idées et des trois mixtes retenues figure en annexe.</p>
+</section>
+
+<section id="suivi"><h2>Suivi et encadrement</h2>
+<ol class="tl">
+<li><span class="k">Vendredi 25 avril</span><br>Première réunion de suivi avec mon tuteur : bilan de ma maîtrise des six articles et des fondamentaux de la détection de communautés.</li>
+<li><span class="k">1er mai</span><br>Point sur la recherche d'améliorations. Présentation des améliorations trouvées et de la matrice de taxonomie ; préparation de la hiérarchisation et de la mise en forme des résultats.</li>
+<li><span class="k">Mardi 6 mai</span><br>Fin de la phase bibliographique. Présentation du schéma arborescent des algorithmes principaux et de leurs améliorations pour finaliser l'état de l'art.</li>
+<li><span class="k">Mardi 13 mai</span><br>Présentation des neuf idées et des trois mixtes. Une proposition a été retenue pour la suite car elle offrait le meilleur équilibre entre originalité et faisabilité. Piste complémentaire discutée : intégrer des CNN pour classer les nœuds restants non catégorisés, en alliant méthodes classiques et apprentissage profond.</li>
+</ol>
+</section>
+
+<section id="outils"><h2>Outils utilisés</h2>
+<ul>
+<li><b>Microsoft Word</b> : synthèses d'articles, définitions et améliorations des algorithmes, notes.</li>
+<li><b>Google Scholar</b> : exploration des articles cités dans les six articles de base.</li>
+<li><b>Canva</b> : matrice de taxonomie, classification par familles, hiérarchisation.</li>
+<li><b>draw.io</b> : schémas de fonctionnement des idées d'algorithmes.</li>
+<li><b>Recherche internet</b> : explications simplifiées et exemples d'application.</li>
+</ul>
+</section>
+
+<section id="annexes"><h2>Annexes</h2>
+
+<h3>Annexe 1 · Synthèse des six articles</h3>
+<details><summary>1. Extraction et visualisation de communautés sur Twitter (Tribase, NLCOMS)</summary><div>
+<p>Analyse de Twitter par détection de communautés avec l'algorithme Tribase, puis visualisation interactive avec NLCOMS, sur des tweets liés à des articles de presse (projet ANR Info). Tribase s'appuie sur les triangles (trois nœuds tous reliés) comme squelette des communautés. L'indice de cohésion est le nombre de triades fermées divisé par le nombre total de triades ; les groupes soudés et peu connectés à l'extérieur grandissent et deviennent dominants.</p></div></details>
+<details><summary>2. Déploiement des communautés dans les grands réseaux (Louvain)</summary><div>
+<p>Heuristique rapide d'optimisation de la modularité en deux phases répétées : déplacement local des nœuds pour maximiser le gain de modularité (ΔQ), puis agrégation des communautés en super-nœuds. Résultats : meilleure modularité que CNM, PL et WT, 152 minutes pour 118 millions de nœuds, 3 à 5 passes en général, jusqu'à 98 % de bons classements sur des benchmarks, hiérarchie à 6 niveaux sur un réseau mobile belge de 2,04 millions de clients. Le goulot devient la mémoire, non le temps de calcul.</p></div></details>
+<details><summary>3. Détection de communautés dans les graphes (revue, physique statistique)</summary><div>
+<p>Vue d'ensemble : méthodes traditionnelles (partitionnement, clustering hiérarchique, spectral) et modernes (divisives, modularité, dynamiques, inférence statistique). Évaluation sur benchmarks (Zachary's Karate Club, LFR) avec NMI, ARI, F1. Applications en biologie, sociologie et informatique. Problèmes persistants : pas de définition universelle, algorithmes peu comparables, hypothèse d'une seule communauté par nœud.</p></div></details>
+<details><summary>4. Paradigmes parallèles et distribués (revue méthodologique)</summary><div>
+<p>Revue systématique : 65 articles retenus sur 3220 dans 5 bases scientifiques. Dix familles d'approches (divisive, modularité, spectrale, vraisemblance, diffusion, compression, hiérarchique, propagation de labels, Walktrap, percolation de cliques). Méthodes parallèles (OpenMP, CUDA/GPU) et distribuées (MapReduce/Hadoop, Spark, GraphLab, MPI). Pistes : réseaux évolutifs, communautés chevauchantes, efficacité en parallèle.</p></div></details>
+<details><summary>5. Trouver la structure communautaire dans de très grands réseaux</summary><div>
+<p>Algorithme glouton qui fusionne à chaque tour les deux communautés augmentant le plus la modularité, avec des structures de données rapides (arbres binaires, heaps). Appliqué à un réseau de copurchats Amazon de 409 687 produits et 2 464 630 liens : 1684 communautés, Q = 0,745, communautés thématiques (musique classique, science-fiction, vidéos pour enfants) dont les tailles suivent une loi de puissance.</p></div></details>
+<details><summary>6. Enquête sur la détection communautaire par apprentissage profond</summary><div>
+<p>Nouvelle taxonomie en six familles : CNN/GCN, GAT, GAN, autoencodeurs, factorisation matricielle non négative profonde, Deep Sparse Filtering. Jeux de données, métriques (Q, NMI, ARI, F1) et outils open source. Défis : explicabilité, scalabilité, peu de données étiquetées, besoins de calcul. Perspectives : fusion structure/attributs/temps, nouvelles architectures GNN, apprentissage auto-supervisé, transfert de connaissances.</p></div></details>
+
+<h3>Annexe 2 · Définition des algorithmes</h3>
+<div class="tw"><table>
+<tr><th>Algorithme</th><th>Principe</th><th>Limites principales</th></tr>
+<tr><td>Tribase</td><td>Triangles locaux comme bases, puis expansion locale</td><td>Rate les communautés peu triangulaires</td></tr>
+<tr><td>Louvain (2008)</td><td>Maximise la modularité : déplacement local puis agrégation</td><td>Limite de résolution, non déterministe, pas de chevauchement</td></tr>
+<tr><td>Girvan-Newman (2002)</td><td>Supprime les arêtes de plus forte betweenness</td><td>Très lent, non scalable, destructif</td></tr>
+<tr><td>Wu &amp; Huberman (2004)</td><td>Graphe vu comme un circuit électrique, potentiels entre deux pôles</td><td>Sensible au choix des pôles</td></tr>
+<tr><td>Walktrap (2005)</td><td>Distances issues de marches aléatoires courtes, fusion hiérarchique</td><td>Coût élevé, sensible à la longueur de marche</td></tr>
+<tr><td>CPM (2005)</td><td>Communautés = k-cliques adjacentes, chevauchement possible</td><td>Sensible à k, coûteux</td></tr>
+<tr><td>Infomap (2008)</td><td>Compression du parcours d'un marcheur aléatoire</td><td>Pas de chevauchement natif</td></tr>
+<tr><td>MCL (2000)</td><td>Alternance expansion / inflation d'une matrice de flux</td><td>Sensible à l'inflation, mémoire élevée</td></tr>
+<tr><td>LPA (2007)</td><td>Chaque nœud adopte le label majoritaire de ses voisins</td><td>Instable, fusions abusives, pas de hiérarchie</td></tr>
+<tr><td>DBSCAN (1996)</td><td>Zones denses = clusters, le reste = bruit</td><td>Sensible à ε et MinPts, densités variables</td></tr>
+</table></div>
+
+<h3>Annexe 3 · Améliorations trouvées dans la littérature</h3>
+<div class="tw"><table>
+<tr><th>Algorithme de base</th><th>Amélioration</th><th>Apport</th></tr>
+<tr><td>Louvain</td><td>Leiden (Traag et al., 2019)</td><td>Phase de raffinement : communautés bien connectées</td></tr>
+<tr><td>Louvain</td><td>GVE-Louvain (Sahu, 2023)</td><td>Version multicœur, jusqu'à 560 millions d'arêtes/s</td></tr>
+<tr><td>Louvain</td><td>LPA + Louvain (Zhang &amp; Li, 2016)</td><td>Partition initiale rapide par LPA</td></tr>
+<tr><td>Tribase</td><td>Seed Framework (Gupta &amp; Singh, 2023)</td><td>Graines plus générales que les triangles</td></tr>
+<tr><td>Tribase</td><td>Approche multi-vues</td><td>Plusieurs types de relations fusionnés</td></tr>
+<tr><td>Girvan-Newman</td><td>Spectral modularity maximization</td><td>Maximise Q sans détruire le graphe</td></tr>
+<tr><td>Girvan-Newman</td><td>LFM</td><td>Communautés chevauchantes et hiérarchiques</td></tr>
+<tr><td>Walktrap</td><td>Approches deep learning (GCN, GAT, VGAE)</td><td>Paramètres appris, données supplémentaires intégrées</td></tr>
+<tr><td>Infomap</td><td>Higher-Order Infomap (Lambiotte et al., 2019)</td><td>Dépendances de mémoire d'ordre supérieur</td></tr>
+<tr><td>LPA</td><td>LPA-MNI (Feng et al., 2021)</td><td>Initialisation par modularité, ordre par importance : stable</td></tr>
+<tr><td>CPM</td><td>BIGCLAM (Yang &amp; Leskovec, 2013)</td><td>Factorisation matricielle, appartenance continue</td></tr>
+<tr><td>Wu &amp; Huberman</td><td>PSWH (Sun &amp; Ding, 2013)</td><td>Sélection automatique des pôles</td></tr>
+<tr><td>MCL</td><td>HipMCL (Azad et al., 2018)</td><td>Parallèle : 70 M de nœuds en 2,4 h sur 2048 cœurs</td></tr>
+<tr><td>DBSCAN</td><td>HDBSCAN (Campello et al., 2013)</td><td>Plus de ε, densités variables</td></tr>
+</table></div>
+
+<h3>Annexe 4 · Les neuf idées</h3>
+<details><summary>Idées 1 à 3 : double label et intersection</summary><div>
+<p><b>Idée 1.</b> Chaque nœud reçoit deux labels différents ; on observe leur propagation, on garde l'intersection des nœuds touchés par les deux, puis une étape de raffinement (marche aléatoire, modularité...) améliore la précision. Cela réduit l'instabilité, empêche la domination d'un label et combine un critère local et un critère global.</p>
+<p><b>Idée 2.</b> Comme l'idée 1, mais l'intersection est fusionnée en un super-nœud, ce qui réduit la complexité du graphe et accélère les calculs de modularité.</p>
+<p><b>Idée 3.</b> Choisir les deux nœuds les plus centraux (degré), propager deux labels en parallèle, garder l'intersection comme noyau robuste, le fusionner en super-nœud puis raffiner.</p></div></details>
+<details><summary>Idées 4 à 6 : poids des arêtes traversées</summary><div>
+<p><b>Idée 4.</b> Chaque nœud propage son label ; chaque passage sur une arête incrémente son poids (initialement 0). On garde les arêtes dépassant un seuil et les communautés sont les composantes connexes obtenues. Force : contrôle de la cohésion par le seuil, résistance au bruit. Limites : coût de propagation, choix du seuil.</p>
+<p><b>Idée 5.</b> Idée 4 avec une profondeur maximale de propagation pour gagner en performance.</p>
+<p><b>Idée 6.</b> Propager seulement depuis les 10 % de nœuds les plus centraux (degré), avec un seuil cohérent avec ce nombre de nœuds, ce qui demande une formule mathématique.</p></div></details>
+<details><summary>Idées 7 à 9 : LFM, Leiden et propagation multi-centres</summary><div>
+<p><b>Idée 7.</b> LFM suivi de l'étape de raffinement de Leiden : on teste la connexité de chaque communauté et on la scinde en composantes connexes si besoin. Limites : fragmentation excessive sur graphes peu denses, coût du test, risque de cycle en cas de ré-expansion.</p>
+<p><b>Idée 8.</b> Avant d'appliquer LFM, vérifier que le nœud est connecté à au moins x nœuds de la communauté. Problème : l'initialisation, puisque les petites communautés n'ont pas encore x nœuds connectés.</p>
+<p><b>Idée 9.</b> Prendre les N nœuds les plus centraux, un label distinct chacun, propager, marquer les nœuds atteints, prendre l'intersection comme noyau puis l'étendre. Si l'intersection est vide, garder les nœuds marqués par au moins K labels sur N.</p></div></details>
+
+<h3>Annexe 5 · Les idées les plus pertinentes</h3>
+<details open><summary>Mixte des idées 1, 2, 3 et 9</summary><div>
+<ol>
+<li>Sélectionner les N nœuds les plus centraux (degré), un label distinct chacun.</li>
+<li>Fixer une profondeur maximale D et propager les labels en parallèle.</li>
+<li>Intersection souple : garder les nœuds atteints par au moins K labels sur N (noyau robuste).</li>
+<li>Compression optionnelle du noyau en super-nœud.</li>
+<li>Expansion structurée : propagation de labels, ajout de voisins fortement liés au noyau, ou raffinement par Louvain/Leiden.</li>
+</ol></div></details>
+<details><summary>Mixte des idées 4, 5 et 6</summary><div>
+<ol>
+<li>Prendre les 10 % de nœuds les plus centraux, un label unique chacun.</li>
+<li>Propager chaque label jusqu'à la profondeur D, en incrémentant le poids de chaque arête traversée.</li>
+<li>Filtrer : conserver les arêtes dont le poids atteint le seuil.</li>
+<li>Reconstruire : chaque composante connexe restante devient une communauté.</li>
+</ol></div></details>
+<details><summary>Mixte des idées 7 et 8</summary><div>
+<ol>
+<li>Calculer la centralité (degré, PageRank...) de tous les nœuds et retenir les K plus centraux comme seeds.</li>
+<li>Pour chaque seed, appliquer LFM pour obtenir une communauté candidate.</li>
+<li>Tester sa connexité : si elle est connexe on la garde, sinon on la divise en composantes connexes.</li>
+<li>Répéter jusqu'à avoir traité tous les seeds.</li>
+</ol></div></details>
+</section>
+
+</main>
+<footer>Rapport de stage de Youcef Melakhessou · Licence Informatique, Université de Lorraine · LCOMS · 2025</footer>
+</div>
+</div>
+<script>
+(function(){var l=[].slice.call(document.querySelectorAll('nav a')),s=l.map(function(a){return document.querySelector(a.getAttribute('href'))});
+if(!('IntersectionObserver' in window))return;
+var o=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){l.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+x.target.id)})}})},{rootMargin:'-20% 0px -70% 0px'});
+s.forEach(function(x){o.observe(x)})})();
+</script>
+</body>
+</html>
