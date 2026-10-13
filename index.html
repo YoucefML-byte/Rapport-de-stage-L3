@@ -4,79 +4,279 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rapport de stage – Détection de communautés dans les graphes</title>
+<meta name="description" content="Rapport de stage de Youcef Melakhessou (Licence Informatique, Université de Lorraine, LCOMS) : détection de communautés dans les graphes, état de l'art, taxonomie et idées d'algorithmes de propagation locale.">
+<meta name="author" content="Youcef Melakhessou">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Détection de communautés dans les graphes – Rapport de stage">
+<meta property="og:description" content="État de l'art, taxonomie des algorithmes et idées d'algorithmes de propagation locale. LCOMS, Université de Lorraine, 2025.">
+<meta name="theme-color" content="#f7f8fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231e4fd8'/%3E%3Cg stroke='%23fff' stroke-width='1.6' opacity='.7'%3E%3Cpath d='M9 10l6 3M9 10l-1 9M15 13l-7 6M15 13l9-2M8 19l9 4M24 11l-7 12'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Ccircle cx='9' cy='10' r='2.6'/%3E%3Ccircle cx='15' cy='13' r='2.6'/%3E%3Ccircle cx='8' cy='19' r='2.6'/%3E%3Ccircle cx='24' cy='11' r='2.6'/%3E%3Ccircle cx='17' cy='23' r='2.6'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<script>
+/* Applique le thème mémorisé avant le premier rendu pour éviter un flash */
+try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
+</script>
 <style>
-:root{--bg:#fbfcfe;--ink:#14213d;--muted:#55607a;--blue:#0a49b0;--sky:#4db3f0;--line:#d9e2f1;--soft:#eef3fb;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1526;--ink:#e6ecf7;--muted:#9aa7c2;--blue:#7fb0ff;--sky:#4db3f0;--line:#243252;--soft:#15203a}}
-:root[data-theme="dark"]{--bg:#0d1526;--ink:#e6ecf7;--muted:#9aa7c2;--blue:#7fb0ff;--sky:#4db3f0;--line:#243252;--soft:#15203a}
-*,*::before,*::after{box-sizing:inherit}
-html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 1rem)}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 1.06rem/1.7 "Source Serif 4",Georgia,serif}
-h1,h2,h3,nav,.meta,th,summary,.k{font-family:Poppins,"Helvetica Neue",Arial,sans-serif}
-a{color:var(--blue)}
-:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
-.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:3rem;max-width:1080px;margin:0 auto;padding:0 1.25rem}
-nav{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;padding:2rem 0;font-size:.86rem}
-nav b{display:block;margin-bottom:.8rem;color:var(--blue)}
-nav a{display:block;padding:.3rem 0 .3rem .8rem;border-left:2px solid var(--line);color:var(--muted);text-decoration:none}
-nav a:hover,nav a.on{color:var(--blue);border-color:var(--blue)}
-header{padding:3rem 0 1.5rem;border-bottom:1px solid var(--line)}
-header .g{display:grid;grid-template-columns:1fr 200px;gap:1.5rem;align-items:center}
-h1{font-size:clamp(1.9rem,4.5vw,2.9rem);line-height:1.15;margin:.2rem 0 1rem;color:var(--blue);font-weight:700}
-.sub{color:var(--muted);margin:0 0 1.2rem}
-.meta{display:grid;grid-template-columns:auto 1fr;gap:.25rem 1rem;font-size:.85rem;margin:0}
-.meta dt{color:var(--muted)}.meta dd{margin:0;font-weight:500}
-svg.graph{width:100%;height:auto}
-main{padding-bottom:4rem;max-width:68ch}
-section{padding-top:2.5rem}
-h2{font-size:1.5rem;margin:0 0 .8rem;color:var(--blue);font-weight:600}
-h3{font-size:1.08rem;margin:1.8rem 0 .4rem;font-weight:600}
-p{margin:.7rem 0}li{margin:.3rem 0}
-.tw{overflow-x:auto;margin:1rem 0}
-table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:420px}
-th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
-th{background:var(--soft);font-size:.82rem}
-ol.tl{list-style:none;margin:1rem 0;padding:0 0 0 1.2rem;border-left:2px solid var(--sky)}
-ol.tl li{margin:0 0 1.1rem;position:relative}
-ol.tl li::before{content:"";position:absolute;left:-1.6rem;top:.55rem;width:.6rem;height:.6rem;border-radius:50%;background:var(--blue)}
-.k{font-weight:600;font-size:.9rem;color:var(--blue)}
-details{border:1px solid var(--line);border-radius:6px;margin:.6rem 0;background:var(--soft)}
-summary{cursor:pointer;padding:.7rem 1rem;font-weight:500;font-size:.95rem}
-details>div{padding:0 1rem 1rem}
-.note{border-left:3px solid var(--sky);padding:.1rem 1rem;background:var(--soft)}
-footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted);font-size:.85rem;font-family:Poppins,Arial,sans-serif}
-@media(max-width:820px){.wrap{display:block}nav{position:static;padding:1rem 0 0;display:flex;flex-wrap:wrap;gap:.2rem .9rem}nav b{width:100%;margin:0}nav a{border:0;padding:.2rem 0}header .g{grid-template-columns:1fr}svg.graph{max-width:220px}}
+:root{
+  --bg:#f7f8fb;--surface:#ffffff;--ink:#0f1a2e;--ink-2:#334155;--muted:#64748b;
+  --accent:#1e4fd8;--accent-ink:#1a44bb;--accent-soft:#e8eefc;--sky:#0ea5e9;--violet:#7c3aed;
+  --line:#e2e8f0;--line-2:#cbd5e1;--soft:#f1f5f9;
+  --shadow:0 1px 2px rgb(15 26 46 / .04),0 4px 16px rgb(15 26 46 / .06);
+  --radius:12px;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1220;--surface:#111a2c;--ink:#e7ecf5;--ink-2:#c3cddd;--muted:#8b98ae;
+    --accent:#7aa2ff;--accent-ink:#9db9ff;--accent-soft:#18264a;--sky:#38bdf8;--violet:#a78bfa;
+    --line:#1f2b42;--line-2:#2c3a55;--soft:#0f1829;
+    --shadow:0 1px 2px rgb(0 0 0 / .3),0 4px 16px rgb(0 0 0 / .25);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1220;--surface:#111a2c;--ink:#e7ecf5;--ink-2:#c3cddd;--muted:#8b98ae;
+  --accent:#7aa2ff;--accent-ink:#9db9ff;--accent-soft:#18264a;--sky:#38bdf8;--violet:#a78bfa;
+  --line:#1f2b42;--line-2:#2c3a55;--soft:#0f1829;
+  --shadow:0 1px 2px rgb(0 0 0 / .3),0 4px 16px rgb(0 0 0 / .25);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:5rem;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg);color:var(--ink-2);font:400 1.075rem/1.75 var(--serif);
+  text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+h1,h2,h3,nav,summary,th,.eyebrow,.meta,.k,footer,.theme-toggle{font-family:var(--sans)}
+a{color:var(--accent);text-underline-offset:3px}
+b,strong{color:var(--ink);font-weight:600}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+::selection{background:var(--accent-soft);color:var(--ink)}
+
+/* Barre de progression de lecture (décorative, navigateurs compatibles uniquement) */
+.progress{position:fixed;inset:0 0 auto 0;height:3px;z-index:50;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--accent),var(--sky));pointer-events:none}
+@supports (animation-timeline:scroll()){
+  .progress{animation:grow linear both;animation-timeline:scroll(root)}
+  @keyframes grow{to{transform:scaleX(1)}}
+}
+
+/* ---------- En-tête ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(60rem 30rem at 85% -10%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%),
+    radial-gradient(40rem 24rem at -10% 110%,color-mix(in srgb,var(--sky) 10%,transparent),transparent 70%),
+    var(--surface)}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:radial-gradient(var(--line-2) 1px,transparent 1px);background-size:22px 22px;
+  mask-image:linear-gradient(180deg,#000 0%,transparent 75%);-webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 75%)}
+.hero-inner{position:relative;max-width:1180px;margin:0 auto;padding:4.5rem 1.5rem 3.5rem;
+  display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:3rem;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;margin:0 0 1.1rem;padding:.3rem .75rem;
+  font-size:.78rem;font-weight:600;letter-spacing:.02em;color:var(--accent-ink);
+  background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);border-radius:999px}
+.eyebrow::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:var(--accent)}
+h1{margin:0 0 2rem;color:var(--ink);font-weight:700;letter-spacing:-.025em;line-height:1.08;
+  font-size:clamp(2.1rem,5.2vw,3.6rem);text-wrap:balance}
+.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin:0}
+.meta div{padding:.8rem 1rem;background:color-mix(in srgb,var(--surface) 80%,transparent);
+  border:1px solid var(--line);border-radius:10px;backdrop-filter:blur(6px)}
+.meta dt{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem}
+.meta dd{margin:0;font-size:.9rem;font-weight:500;line-height:1.4;color:var(--ink)}
+.graph-wrap{position:relative;aspect-ratio:1;display:grid;place-items:center}
+.graph-wrap::before{content:"";position:absolute;inset:6%;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--accent) 12%,transparent),transparent 70%)}
+svg.graph{position:relative;width:100%;height:auto;overflow:visible}
+svg.graph .halo{opacity:.12}
+.theme-toggle{position:absolute;top:1rem;right:1.25rem;z-index:2;display:inline-grid;place-items:center;
+  width:2.4rem;height:2.4rem;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink);cursor:pointer;box-shadow:var(--shadow);transition:border-color .2s,transform .2s}
+.theme-toggle:hover{border-color:var(--line-2);transform:translateY(-1px)}
+.theme-toggle svg{width:1.1rem;height:1.1rem}
+.theme-toggle .moon{display:none}
+:root[data-theme="dark"] .theme-toggle .sun{display:none}
+:root[data-theme="dark"] .theme-toggle .moon{display:block}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .theme-toggle .sun{display:none}
+  :root:not([data-theme="light"]) .theme-toggle .moon{display:block}
+}
+
+/* ---------- Mise en page ---------- */
+.layout{max-width:1180px;margin:0 auto;padding:0 1.5rem;display:grid;grid-template-columns:220px minmax(0,1fr);gap:4rem}
+nav.toc{position:sticky;top:0;align-self:start;max-height:100vh;overflow:auto;padding:3rem 0 2rem;
+  scroll-target-group:auto;counter-reset:toc}
+nav.toc b{display:block;margin:0 0 .9rem;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+nav.toc a{counter-increment:toc;position:relative;display:flex;gap:.7rem;align-items:baseline;
+  padding:.42rem .75rem;margin-left:-.75rem;border-radius:8px;font-size:.88rem;font-weight:500;
+  color:var(--muted);text-decoration:none;transition:color .15s,background-color .15s}
+nav.toc a::before{content:counter(toc,decimal-leading-zero);font-size:.72rem;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--line-2);transition:color .15s}
+nav.toc a:hover{color:var(--ink);background:var(--soft)}
+nav.toc a:is(:target-current,.\:target-current){color:var(--accent-ink);background:var(--accent-soft);font-weight:600}
+nav.toc a:is(:target-current,.\:target-current)::before{color:var(--accent)}
+
+main{min-width:0;max-width:72ch;padding:1rem 0 5rem;counter-reset:sec}
+section{padding-top:3.5rem;scroll-margin-top:1rem}
+section+section{border-top:1px solid var(--line);margin-top:3.5rem}
+h2{counter-increment:sec;margin:0 0 1.25rem;color:var(--ink);font-size:clamp(1.5rem,2.6vw,1.9rem);
+  font-weight:700;letter-spacing:-.02em;line-height:1.2;text-wrap:balance}
+h2::before{content:counter(sec,decimal-leading-zero);display:block;margin-bottom:.5rem;
+  font-size:.78rem;font-weight:600;letter-spacing:.12em;color:var(--accent)}
+h3{margin:2.25rem 0 .6rem;color:var(--ink);font-size:1.1rem;font-weight:600;letter-spacing:-.01em;line-height:1.35}
+p{margin:.85rem 0}
+ul,ol{padding-left:1.4rem}
+li{margin:.4rem 0}
+li::marker{color:var(--accent);font-family:var(--sans);font-weight:600}
+main>section>ul{list-style:none;padding:0}
+main>section>ul>li{position:relative;padding-left:1.5rem}
+main>section>ul>li::before{content:"";position:absolute;left:.15rem;top:.72em;width:.45rem;height:.45rem;
+  border-radius:2px;background:var(--accent);transform:rotate(45deg)}
+
+/* Encadrés de liste (améliorations, outils) */
+ul.cards{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));margin:1.25rem 0}
+main>section>ul.cards>li{margin:0;padding:1rem 1.1rem;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);font-size:.98rem;line-height:1.6}
+main>section>ul.cards>li::before{display:none}
+ul.cards b{font-family:var(--sans);font-size:.95rem;color:var(--accent-ink)}
+
+/* ---------- Tableaux ---------- */
+.tw{container-type:inline-size;margin:1.5rem 0;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);box-shadow:var(--shadow);overflow:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:.94rem;line-height:1.55}
+th,td{text-align:left;padding:.75rem 1rem;vertical-align:top;border-bottom:1px solid var(--line)}
+tbody tr:last-child>*{border-bottom:0}
+thead th{position:sticky;top:0;z-index:1;background:var(--soft);color:var(--muted);
+  font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+tbody th{font-weight:600;font-size:.9rem;color:var(--ink);white-space:nowrap}
+tbody tr{transition:background-color .15s}
+tbody tr:hover{background:color-mix(in srgb,var(--accent-soft) 45%,transparent)}
+@container (width < 520px){
+  table,thead,tbody,tr,th,td{display:block}
+  thead{display:none}
+  tbody tr{padding:.85rem 1rem;border-bottom:1px solid var(--line)}
+  tbody tr:last-child{border-bottom:0}
+  tbody th,tbody td{padding:.15rem 0;border:0;white-space:normal}
+  tbody th{font-size:.98rem;margin-bottom:.25rem}
+  tbody td::before{display:block;font-family:var(--sans);font-size:.7rem;font-weight:600;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted)}
+  tbody td:nth-child(2)::before{content:var(--l2);content:var(--l2) / var(--l2)}
+  tbody td:nth-child(3)::before{content:var(--l3);content:var(--l3) / var(--l3);margin-top:.35rem}
+}
+
+/* ---------- Chronologie ---------- */
+ol.tl{list-style:none;margin:1.5rem 0;padding:0;position:relative}
+ol.tl::before{content:"";position:absolute;left:.55rem;top:.6rem;bottom:.6rem;width:2px;
+  background:linear-gradient(var(--accent),var(--sky));border-radius:2px}
+ol.tl li{position:relative;margin:0 0 1rem;padding:1rem 1.2rem;margin-left:2.25rem;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+ol.tl li::before{content:"";position:absolute;left:-2.05rem;top:1.25rem;width:.85rem;height:.85rem;border-radius:50%;
+  background:var(--surface);border:3px solid var(--accent)}
+.k{display:inline-block;margin-bottom:.15rem;font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+
+/* ---------- Blocs repliables ---------- */
+details{margin:.65rem 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);transition:border-color .2s}
+details:hover{border-color:var(--line-2)}
+details[open]{border-color:color-mix(in srgb,var(--accent) 35%,var(--line))}
+summary{list-style:none;cursor:pointer;display:flex;gap:1rem;justify-content:space-between;align-items:center;
+  padding:.95rem 1.15rem;font-size:.95rem;font-weight:600;line-height:1.4;color:var(--ink)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";flex:none;width:.55rem;height:.55rem;margin-right:.2rem;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);
+  transition:transform .2s}
+details[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
+details>div{padding:0 1.15rem 1rem;border-top:1px solid var(--line);font-size:1rem}
+details>div>:first-child{margin-top:1rem}
+
+/* ---------- Pied de page ---------- */
+footer{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px solid var(--line);
+  color:var(--muted);font-size:.85rem;text-align:center}
+
+/* ---------- Responsive ---------- */
+@media (max-width:960px){
+  .hero-inner{grid-template-columns:1fr;padding-top:4rem;gap:1.5rem}
+  .graph-wrap{display:none}
+  .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .layout{display:block;padding:0}
+  nav.toc{z-index:10;display:flex;gap:.35rem;max-height:none;overflow-x:auto;padding:.6rem 1rem;
+    background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);scrollbar-width:none}
+  nav.toc::-webkit-scrollbar{display:none}
+  nav.toc b{display:none}
+  nav.toc a{flex:none;margin:0;padding:.35rem .75rem;font-size:.82rem;white-space:nowrap;border:1px solid var(--line);background:var(--surface)}
+  nav.toc a:is(:target-current,.\:target-current){border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+  main{margin:0 auto;padding:0 1rem 4rem}
+  html{scroll-padding-top:4rem}
+}
+@media (max-width:520px){
+  .meta{grid-template-columns:1fr}
+  body{font-size:1.02rem}
+}
+
+/* ---------- Impression ---------- */
+@media print{
+  @page{margin:18mm 16mm}
+  :root{--bg:#fff;--surface:#fff;--shadow:none}
+  body{font-size:11pt;color:#000}
+  .progress,.theme-toggle,nav.toc,.graph-wrap{display:none!important}
+  .hero{background:none;border:0}.hero::before{display:none}
+  .hero-inner{display:block;padding:0 0 1rem}
+  .layout{display:block;padding:0}
+  main{max-width:none;padding:0}
+  section{break-inside:auto;padding-top:1.5rem}
+  section+section{margin-top:1.5rem}
+  h2,h3{break-after:avoid}
+  details,ol.tl li,.tw,ul.cards>li{box-shadow:none;break-inside:avoid}
+  details>summary::after{display:none}
+  details:not([open])>div{display:block}
+  thead th{position:static}
+  a{color:inherit;text-decoration:none}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-<nav aria-label="Sommaire">
+<div class="progress" aria-hidden="true"></div>
+
+<header class="hero">
+<button class="theme-toggle" type="button" aria-label="Basculer le thème clair / sombre" title="Thème clair / sombre">
+<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+</button>
+<div class="hero-inner">
+<div>
+<p class="eyebrow">Rapport de stage 2024-2025 · 3ème année de Licence Informatique</p>
+<h1>Détection de communautés dans les graphes</h1>
+<dl class="meta">
+<div><dt>Auteur</dt><dd>Youcef Melakhessou</dd></div>
+<div><dt>Période</dt><dd>23 avril – 18 juin 2025</dd></div>
+<div><dt>Structure</dt><dd>LCOMS, Université de Lorraine</dd></div>
+<div><dt>Tuteurs</dt><dd>Youcef Abdelsadek, Kamel Chelghoum</dd></div>
+</dl>
+</div>
+<div class="graph-wrap">
+<svg class="graph" viewBox="0 0 200 180" role="img" aria-label="Graphe composé de trois communautés reliées entre elles">
+<g class="halo"><circle cx="62" cy="65" r="42" fill="var(--accent)"/><circle cx="141" cy="52" r="42" fill="var(--sky)"/><circle cx="131" cy="140" r="38" fill="var(--violet)"/></g>
+<g stroke="var(--line-2)" stroke-width="1.5" stroke-linecap="round"><path d="M55 40L85 55M55 40L40 75M85 55L40 75M85 55L70 90M40 75L70 90M150 35L175 65M150 35L130 70M175 65L130 70M150 35L110 40M120 130L160 120M120 130L140 160M160 120L140 160M120 130L100 150M85 55L110 40M70 90L120 130M130 70L160 120"/></g>
+<g fill="var(--accent)" stroke="var(--surface)" stroke-width="2.5"><circle cx="55" cy="40" r="7"/><circle cx="85" cy="55" r="7"/><circle cx="40" cy="75" r="7"/><circle cx="70" cy="90" r="7"/></g>
+<g fill="var(--sky)" stroke="var(--surface)" stroke-width="2.5"><circle cx="150" cy="35" r="7"/><circle cx="175" cy="65" r="7"/><circle cx="130" cy="70" r="7"/><circle cx="110" cy="40" r="7"/></g>
+<g fill="var(--violet)" stroke="var(--surface)" stroke-width="2.5"><circle cx="120" cy="130" r="7"/><circle cx="160" cy="120" r="7"/><circle cx="140" cy="160" r="7"/><circle cx="100" cy="150" r="7"/></g>
+</svg>
+</div>
+</div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Sommaire">
 <b>Sommaire</b>
 <a href="#resume">Résumé</a><a href="#intro">Introduction</a><a href="#biblio">Étude bibliographique</a><a href="#taxo">Taxonomie et classification</a><a href="#idees">Idées d'algorithmes</a><a href="#suivi">Suivi du stage</a><a href="#outils">Outils</a><a href="#annexes">Annexes</a>
 </nav>
-<div>
-<header>
-<div class="g">
-<div>
-<p class="sub">Rapport de stage 2024-2025 · 3ème année de Licence Informatique</p>
-<h1>Détection de communautés dans les graphes</h1>
-<dl class="meta">
-<dt>Auteur</dt><dd>Youcef Melakhessou</dd>
-<dt>Période</dt><dd>23 avril – 18 juin 2025</dd>
-<dt>Structure</dt><dd>LCOMS, Université de Lorraine</dd>
-<dt>Tuteurs</dt><dd>Youcef Abdelsadek, Kamel Chelghoum</dd>
-</dl>
-</div>
-<svg class="graph" viewBox="0 0 200 180" role="img" aria-label="Graphe composé de trois communautés reliées entre elles">
-<g stroke="var(--line)" stroke-width="1.5"><path d="M55 40L85 55M55 40L40 75M85 55L40 75M85 55L70 90M40 75L70 90M150 35L175 65M150 35L130 70M175 65L130 70M150 35L110 40M120 130L160 120M120 130L140 160M160 120L140 160M120 130L100 150M85 55L110 40M70 90L120 130M130 70L160 120"/></g>
-<g fill="var(--blue)"><circle cx="55" cy="40" r="7"/><circle cx="85" cy="55" r="7"/><circle cx="40" cy="75" r="7"/><circle cx="70" cy="90" r="7"/></g>
-<g fill="var(--sky)"><circle cx="150" cy="35" r="7"/><circle cx="175" cy="65" r="7"/><circle cx="130" cy="70" r="7"/><circle cx="110" cy="40" r="7"/></g>
-<g fill="var(--ink)" opacity=".75"><circle cx="120" cy="130" r="7"/><circle cx="160" cy="120" r="7"/><circle cx="140" cy="160" r="7"/><circle cx="100" cy="150" r="7"/></g>
-</svg>
-</div>
-</header>
+
 <main>
 
 <section id="resume"><h2>Résumé</h2>
@@ -84,7 +284,7 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted)
 <p>L'objectif principal est de proposer un algorithme de détection de communautés basé sur la propagation locale. Le travail s'est structuré en quatre étapes :</p>
 <ol><li>une étude bibliographique approfondie des méthodes existantes (agglomératives, divisives, parallèles) ;</li><li>la conception d'un algorithme original ;</li><li>l'implémentation et l'expérimentation en Python (Jupyter Notebook), avec Spark pour les données massives ;</li><li>la visualisation et l'analyse des résultats sur des données synthétiques et réelles.</li></ol>
 <p>Le stage s'est déroulé dans un environnement de calcul haute performance équipé de stations GPU, au sein de la plateforme POHP du LCOMS, avec des dispositifs de visualisation avancés (bornes et tables multi-touch).</p>
-<details><summary>English abstract</summary><div><p>This internship, carried out at the LCOMS laboratory of the University of Lorraine, falls within the field of data science and deep learning, applied to community detection in graphs. It aims to explore effective analytical methods to extract underlying structures, known as communities, in graphs representing interactions between entities. The main objective is to propose a community detection algorithm based on local propagation, through a literature review, the design of an original algorithm, its implementation and experimentation, and the analysis of results on synthetic and real-world datasets.</p></div></details>
+<details lang="en"><summary>English abstract</summary><div><p>This internship, carried out at the LCOMS laboratory of the University of Lorraine, falls within the field of data science and deep learning, applied to community detection in graphs. It aims to explore effective analytical methods to extract underlying structures, known as communities, in graphs representing interactions between entities. The main objective is to propose a community detection algorithm based on local propagation, through a literature review, the design of an original algorithm, its implementation and experimentation, and the analysis of results on synthetic and real-world datasets.</p></div></details>
 </section>
 
 <section id="intro"><h2>Introduction</h2>
@@ -101,7 +301,7 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted)
 <p>Pour comparer les algorithmes objectivement, j'ai construit une matrice de 10 algorithmes choisis parmi une trentaine cités dans les articles (Louvain, Tribase, Infomap et des variantes). Les critères : rapidité et coût, type de communautés détectées (denses, pondérées, chevauchantes, hiérarchiques), scalabilité, précision et limites connues. On y voit par exemple que LPA est rapide, Louvain précis, Tribase bien adapté à Twitter, avec des inconvénients comme la sensibilité aux paramètres ou l'absence de détection chevauchante.</p>
 <h3>Recherche d'améliorations</h3>
 <p>J'ai ensuite cherché comment la littérature répond aux limites des méthodes classiques (lenteur, non-scalabilité, partitions peu cohérentes, absence de chevauchement). Faute de temps pour lire toutes les références, j'ai procédé par filtrage : repérage de titres évoquant une amélioration (« improvement », « parallel », « scalable », « hybrid »...), lecture des résumés, sélection des articles proposant une vraie variante, puis analyse rapide de la méthode et des comparaisons avec l'original. Cela a fait ressortir 14 améliorations notables, dont :</p>
-<ul>
+<ul class="cards">
 <li><b>Leiden</b> : renforce la cohérence interne des communautés de Louvain.</li>
 <li><b>GVE-Louvain</b> : traitement massivement parallèle pour des graphes de taille industrielle.</li>
 <li><b>Seed Framework</b> : généralise l'approche TriBase aux graphes peu triadiques.</li>
@@ -113,14 +313,16 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted)
 
 <section id="taxo"><h2>Taxonomie et classification</h2>
 <p>J'ai classé les algorithmes en six familles selon leur principe de fonctionnement dominant :</p>
-<div class="tw"><table>
-<tr><th>Famille</th><th>Algorithmes</th></tr>
-<tr><td>Optimisation de la modularité</td><td>Louvain, Leiden, GVE-Louvain, Spectral modularity maximization</td></tr>
-<tr><td>Propagation locale</td><td>LPA, LPA-MNI, Wu &amp; Huberman, PSWH, MCL, HipMCL</td></tr>
-<tr><td>Méthodes hiérarchiques</td><td>HDBSCAN, Walktrap, Girvan-Newman</td></tr>
-<tr><td>Expansion locale</td><td>LFM, Tribase, Seed Framework</td></tr>
-<tr><td>Marches aléatoires</td><td>Walktrap, Infomap, Higher-Order Infomap, MCL, HipMCL</td></tr>
-<tr><td>Méthodes orientées densité</td><td>DBSCAN, HDBSCAN, CPM</td></tr>
+<div class="tw"><table style='--l2:"Algorithmes"'>
+<thead><tr><th scope="col">Famille</th><th scope="col">Algorithmes</th></tr></thead>
+<tbody>
+<tr><th scope="row">Optimisation de la modularité</th><td>Louvain, Leiden, GVE-Louvain, Spectral modularity maximization</td></tr>
+<tr><th scope="row">Propagation locale</th><td>LPA, LPA-MNI, Wu &amp; Huberman, PSWH, MCL, HipMCL</td></tr>
+<tr><th scope="row">Méthodes hiérarchiques</th><td>HDBSCAN, Walktrap, Girvan-Newman</td></tr>
+<tr><th scope="row">Expansion locale</th><td>LFM, Tribase, Seed Framework</td></tr>
+<tr><th scope="row">Marches aléatoires</th><td>Walktrap, Infomap, Higher-Order Infomap, MCL, HipMCL</td></tr>
+<tr><th scope="row">Méthodes orientées densité</th><td>DBSCAN, HDBSCAN, CPM</td></tr>
+</tbody>
 </table></div>
 <p>J'ai ensuite réalisé une hiérarchie visuelle qui place chaque algorithme dans sa famille, indique sa stratégie (<b>divisive</b> comme Girvan-Newman, <b>agglomérative</b> comme Walktrap, <b>hybride</b> comme LPA + Louvain) et le relie à ses améliorations (Leiden dérive de Louvain, GVE-Louvain en est une version parallèle). Elle m'a donné une compréhension fine des choix algorithmiques selon le contexte, et une base pour construire un algorithme original.</p>
 </section>
@@ -142,7 +344,7 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted)
 </section>
 
 <section id="outils"><h2>Outils utilisés</h2>
-<ul>
+<ul class="cards">
 <li><b>Microsoft Word</b> : synthèses d'articles, définitions et améliorations des algorithmes, notes.</li>
 <li><b>Google Scholar</b> : exploration des articles cités dans les six articles de base.</li>
 <li><b>Canva</b> : matrice de taxonomie, classification par familles, hiérarchisation.</li>
@@ -168,37 +370,41 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted)
 <p>Nouvelle taxonomie en six familles : CNN/GCN, GAT, GAN, autoencodeurs, factorisation matricielle non négative profonde, Deep Sparse Filtering. Jeux de données, métriques (Q, NMI, ARI, F1) et outils open source. Défis : explicabilité, scalabilité, peu de données étiquetées, besoins de calcul. Perspectives : fusion structure/attributs/temps, nouvelles architectures GNN, apprentissage auto-supervisé, transfert de connaissances.</p></div></details>
 
 <h3>Annexe 2 · Définition des algorithmes</h3>
-<div class="tw"><table>
-<tr><th>Algorithme</th><th>Principe</th><th>Limites principales</th></tr>
-<tr><td>Tribase</td><td>Triangles locaux comme bases, puis expansion locale</td><td>Rate les communautés peu triangulaires</td></tr>
-<tr><td>Louvain (2008)</td><td>Maximise la modularité : déplacement local puis agrégation</td><td>Limite de résolution, non déterministe, pas de chevauchement</td></tr>
-<tr><td>Girvan-Newman (2002)</td><td>Supprime les arêtes de plus forte betweenness</td><td>Très lent, non scalable, destructif</td></tr>
-<tr><td>Wu &amp; Huberman (2004)</td><td>Graphe vu comme un circuit électrique, potentiels entre deux pôles</td><td>Sensible au choix des pôles</td></tr>
-<tr><td>Walktrap (2005)</td><td>Distances issues de marches aléatoires courtes, fusion hiérarchique</td><td>Coût élevé, sensible à la longueur de marche</td></tr>
-<tr><td>CPM (2005)</td><td>Communautés = k-cliques adjacentes, chevauchement possible</td><td>Sensible à k, coûteux</td></tr>
-<tr><td>Infomap (2008)</td><td>Compression du parcours d'un marcheur aléatoire</td><td>Pas de chevauchement natif</td></tr>
-<tr><td>MCL (2000)</td><td>Alternance expansion / inflation d'une matrice de flux</td><td>Sensible à l'inflation, mémoire élevée</td></tr>
-<tr><td>LPA (2007)</td><td>Chaque nœud adopte le label majoritaire de ses voisins</td><td>Instable, fusions abusives, pas de hiérarchie</td></tr>
-<tr><td>DBSCAN (1996)</td><td>Zones denses = clusters, le reste = bruit</td><td>Sensible à ε et MinPts, densités variables</td></tr>
+<div class="tw"><table style='--l2:"Principe";--l3:"Limites principales"'>
+<thead><tr><th scope="col">Algorithme</th><th scope="col">Principe</th><th scope="col">Limites principales</th></tr></thead>
+<tbody>
+<tr><th scope="row">Tribase</th><td>Triangles locaux comme bases, puis expansion locale</td><td>Rate les communautés peu triangulaires</td></tr>
+<tr><th scope="row">Louvain (2008)</th><td>Maximise la modularité : déplacement local puis agrégation</td><td>Limite de résolution, non déterministe, pas de chevauchement</td></tr>
+<tr><th scope="row">Girvan-Newman (2002)</th><td>Supprime les arêtes de plus forte betweenness</td><td>Très lent, non scalable, destructif</td></tr>
+<tr><th scope="row">Wu &amp; Huberman (2004)</th><td>Graphe vu comme un circuit électrique, potentiels entre deux pôles</td><td>Sensible au choix des pôles</td></tr>
+<tr><th scope="row">Walktrap (2005)</th><td>Distances issues de marches aléatoires courtes, fusion hiérarchique</td><td>Coût élevé, sensible à la longueur de marche</td></tr>
+<tr><th scope="row">CPM (2005)</th><td>Communautés = k-cliques adjacentes, chevauchement possible</td><td>Sensible à k, coûteux</td></tr>
+<tr><th scope="row">Infomap (2008)</th><td>Compression du parcours d'un marcheur aléatoire</td><td>Pas de chevauchement natif</td></tr>
+<tr><th scope="row">MCL (2000)</th><td>Alternance expansion / inflation d'une matrice de flux</td><td>Sensible à l'inflation, mémoire élevée</td></tr>
+<tr><th scope="row">LPA (2007)</th><td>Chaque nœud adopte le label majoritaire de ses voisins</td><td>Instable, fusions abusives, pas de hiérarchie</td></tr>
+<tr><th scope="row">DBSCAN (1996)</th><td>Zones denses = clusters, le reste = bruit</td><td>Sensible à ε et MinPts, densités variables</td></tr>
+</tbody>
 </table></div>
 
 <h3>Annexe 3 · Améliorations trouvées dans la littérature</h3>
-<div class="tw"><table>
-<tr><th>Algorithme de base</th><th>Amélioration</th><th>Apport</th></tr>
-<tr><td>Louvain</td><td>Leiden (Traag et al., 2019)</td><td>Phase de raffinement : communautés bien connectées</td></tr>
-<tr><td>Louvain</td><td>GVE-Louvain (Sahu, 2023)</td><td>Version multicœur, jusqu'à 560 millions d'arêtes/s</td></tr>
-<tr><td>Louvain</td><td>LPA + Louvain (Zhang &amp; Li, 2016)</td><td>Partition initiale rapide par LPA</td></tr>
-<tr><td>Tribase</td><td>Seed Framework (Gupta &amp; Singh, 2023)</td><td>Graines plus générales que les triangles</td></tr>
-<tr><td>Tribase</td><td>Approche multi-vues</td><td>Plusieurs types de relations fusionnés</td></tr>
-<tr><td>Girvan-Newman</td><td>Spectral modularity maximization</td><td>Maximise Q sans détruire le graphe</td></tr>
-<tr><td>Girvan-Newman</td><td>LFM</td><td>Communautés chevauchantes et hiérarchiques</td></tr>
-<tr><td>Walktrap</td><td>Approches deep learning (GCN, GAT, VGAE)</td><td>Paramètres appris, données supplémentaires intégrées</td></tr>
-<tr><td>Infomap</td><td>Higher-Order Infomap (Lambiotte et al., 2019)</td><td>Dépendances de mémoire d'ordre supérieur</td></tr>
-<tr><td>LPA</td><td>LPA-MNI (Feng et al., 2021)</td><td>Initialisation par modularité, ordre par importance : stable</td></tr>
-<tr><td>CPM</td><td>BIGCLAM (Yang &amp; Leskovec, 2013)</td><td>Factorisation matricielle, appartenance continue</td></tr>
-<tr><td>Wu &amp; Huberman</td><td>PSWH (Sun &amp; Ding, 2013)</td><td>Sélection automatique des pôles</td></tr>
-<tr><td>MCL</td><td>HipMCL (Azad et al., 2018)</td><td>Parallèle : 70 M de nœuds en 2,4 h sur 2048 cœurs</td></tr>
-<tr><td>DBSCAN</td><td>HDBSCAN (Campello et al., 2013)</td><td>Plus de ε, densités variables</td></tr>
+<div class="tw"><table style='--l2:"Amélioration";--l3:"Apport"'>
+<thead><tr><th scope="col">Algorithme de base</th><th scope="col">Amélioration</th><th scope="col">Apport</th></tr></thead>
+<tbody>
+<tr><th scope="row">Louvain</th><td>Leiden (Traag et al., 2019)</td><td>Phase de raffinement : communautés bien connectées</td></tr>
+<tr><th scope="row">Louvain</th><td>GVE-Louvain (Sahu, 2023)</td><td>Version multicœur, jusqu'à 560 millions d'arêtes/s</td></tr>
+<tr><th scope="row">Louvain</th><td>LPA + Louvain (Zhang &amp; Li, 2016)</td><td>Partition initiale rapide par LPA</td></tr>
+<tr><th scope="row">Tribase</th><td>Seed Framework (Gupta &amp; Singh, 2023)</td><td>Graines plus générales que les triangles</td></tr>
+<tr><th scope="row">Tribase</th><td>Approche multi-vues</td><td>Plusieurs types de relations fusionnés</td></tr>
+<tr><th scope="row">Girvan-Newman</th><td>Spectral modularity maximization</td><td>Maximise Q sans détruire le graphe</td></tr>
+<tr><th scope="row">Girvan-Newman</th><td>LFM</td><td>Communautés chevauchantes et hiérarchiques</td></tr>
+<tr><th scope="row">Walktrap</th><td>Approches deep learning (GCN, GAT, VGAE)</td><td>Paramètres appris, données supplémentaires intégrées</td></tr>
+<tr><th scope="row">Infomap</th><td>Higher-Order Infomap (Lambiotte et al., 2019)</td><td>Dépendances de mémoire d'ordre supérieur</td></tr>
+<tr><th scope="row">LPA</th><td>LPA-MNI (Feng et al., 2021)</td><td>Initialisation par modularité, ordre par importance : stable</td></tr>
+<tr><th scope="row">CPM</th><td>BIGCLAM (Yang &amp; Leskovec, 2013)</td><td>Factorisation matricielle, appartenance continue</td></tr>
+<tr><th scope="row">Wu &amp; Huberman</th><td>PSWH (Sun &amp; Ding, 2013)</td><td>Sélection automatique des pôles</td></tr>
+<tr><th scope="row">MCL</th><td>HipMCL (Azad et al., 2018)</td><td>Parallèle : 70 M de nœuds en 2,4 h sur 2048 cœurs</td></tr>
+<tr><th scope="row">DBSCAN</th><td>HDBSCAN (Campello et al., 2013)</td><td>Plus de ε, densités variables</td></tr>
+</tbody>
 </table></div>
 
 <h3>Annexe 4 · Les neuf idées</h3>
@@ -241,14 +447,57 @@ footer{border-top:1px solid var(--line);padding:1.5rem 0 3rem;color:var(--muted)
 </section>
 
 </main>
+</div>
+
 <footer>Rapport de stage de Youcef Melakhessou · Licence Informatique, Université de Lorraine · LCOMS · 2025</footer>
-</div>
-</div>
+
 <script>
-(function(){var l=[].slice.call(document.querySelectorAll('nav a')),s=l.map(function(a){return document.querySelector(a.getAttribute('href'))});
-if(!('IntersectionObserver' in window))return;
-var o=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){l.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+x.target.id)})}})},{rootMargin:'-20% 0px -70% 0px'});
-s.forEach(function(x){o.observe(x)})})();
+(function(){
+  var root=document.documentElement;
+
+  /* Bouton de thème clair / sombre */
+  var btn=document.querySelector('.theme-toggle');
+  btn.addEventListener('click',function(){
+    var dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme=dark?'light':'dark';
+    try{localStorage.setItem('theme',root.dataset.theme)}catch(e){}
+  });
+
+  /* Sommaire : lien actif (CSS :target-current natif, sinon IntersectionObserver) */
+  var links=[].slice.call(document.querySelectorAll('nav.toc a'));
+  function setCurrent(cur){
+    links.forEach(function(a){
+      var on=a===cur;
+      if(on)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current');
+      if(on&&innerWidth<=960&&a.parentNode.scrollWidth>a.parentNode.clientWidth){
+        a.parentNode.scrollTo({left:a.offsetLeft-16,behavior:'smooth'});
+      }
+    });
+  }
+  if(CSS.supports&&CSS.supports('scroll-target-group: auto')){
+    var sync=function(){setCurrent(document.querySelector('nav.toc a:target-current'))};
+    sync();addEventListener('scrollend',sync);
+  }else if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(!e.isIntersecting)return;
+        var cur=null;
+        links.forEach(function(a){
+          var on=a.getAttribute('href')==='#'+e.target.id;
+          a.classList.toggle(':target-current',on);
+          if(on)cur=a;
+        });
+        setCurrent(cur);
+      });
+    },{rootMargin:'-30% 0px -60% 0px'});
+    links.forEach(function(a){var s=document.querySelector(a.getAttribute('href'));if(s)io.observe(s)});
+  }
+
+  /* Impression : déplier toutes les annexes */
+  var opened=[];
+  addEventListener('beforeprint',function(){opened=[].slice.call(document.querySelectorAll('details:not([open])'));opened.forEach(function(d){d.open=true})});
+  addEventListener('afterprint',function(){opened.forEach(function(d){d.open=false})});
+})();
 </script>
 </body>
 </html>
